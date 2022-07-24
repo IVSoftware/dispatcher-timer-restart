@@ -24,30 +24,41 @@ namespace dispatcher_timer_restart
     /// </summary>
     public sealed partial class MainWindow : Window
     {
-
         public MainWindow()
         {
             this.InitializeComponent();
+            // Create the dispatch timer ONCE
+            dispatcherTimer = new DispatcherTimer();
+            dispatcherTimer.Tick += DispatcherTimer_Tick;
+            dispatcherTimer.Interval = TimeSpan.FromSeconds(1);
+
+            // This will restart the timer every
+            // time the window is activated
             this.Activated += (sender, e) =>
             {
-                dispatcherTimer = new DispatcherTimer();
-                dispatcherTimer.Tick += DispatcherTimer_Tick;
-                dispatcherTimer.Interval = TimeSpan.FromSeconds(1);
-                dispatcherTimer.Start();
+                startOrRestartDispatchTimer();
             };
+        }
+
+        private void startOrRestartDispatchTimer()
+        {
+            dispatcherTimer.Stop(); // If already running
+            blockTime = TimeSpan.FromSeconds(15);
+            Countdown_TexBlock.Text = blockTime.ToString();
+            dispatcherTimer.Start();
         }
 
         private void DispatcherTimer_Tick(object sender, object e)
         {
-            if (blockTime != TimeSpan.Zero)
+            if (blockTime > TimeSpan.Zero)
             {
                 blockTime = blockTime.Subtract(TimeSpan.FromSeconds(1));
                 Countdown_TexBlock.Text = blockTime.ToString();
-            }
-            else
-            {
-                Countdown_TexBlock.Text = "Done";
-                dispatcherTimer.Stop();
+                if (blockTime == TimeSpan.Zero)
+                {
+                    Countdown_TexBlock.Text = "Done";
+                    dispatcherTimer.Stop();
+                }
             }
         }
 
@@ -55,12 +66,7 @@ namespace dispatcher_timer_restart
 
         private DispatcherTimer dispatcherTimer;
 
-        private void buttonRestart_Click(object sender, RoutedEventArgs e)
-        {
-            dispatcherTimer.Stop(); // If already running
-            blockTime = TimeSpan.FromSeconds(15);
-            Countdown_TexBlock.Text = blockTime.ToString();
-            dispatcherTimer.Start();
-        }
+        private void buttonRestart_Click(object sender, RoutedEventArgs e) =>
+            startOrRestartDispatchTimer();
     }
 }
