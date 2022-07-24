@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "dispatcher_timer_restart (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "dispatcher_timer_restart (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
